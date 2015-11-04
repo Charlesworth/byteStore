@@ -1,4 +1,4 @@
-package jsonStore
+package byteStore
 
 import (
 	"log"
