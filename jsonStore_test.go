@@ -10,22 +10,6 @@ func TestInit(t *testing.T) {
 	}
 }
 
-func TestDBRead(t *testing.T) {
-	go dbReader()
-
-	testRead := readRequest{key: "testKey", bucket: "testBucket"}
-	dbReadIn <- testRead
-	select {
-	case out := <-dbReadOut:
-		if out == nil {
-			t.Error("dbWrite failed with valid test input with error:")
-		}
-	case err := <-dbReadErr:
-		t.Error(err)
-	}
-
-}
-
 // func TestPut(t *testing.T) {
 // 	t.Error("not tested")
 // }

@@ -1,21 +1,19 @@
 package jsonStore
 
 import (
-	"errors"
 	"log"
+	"sync"
 	"time"
 
 	"github.com/boltdb/bolt"
 )
 
 var db *bolt.DB
+var mutex *sync.Mutex
 
 func init() {
+	mutex = &sync.Mutex{}
 	startDB()
-
-	dbReadIn = make(chan readRequest)
-	dbReadOut = make(chan []byte)
-	dbReadErr = make(chan error)
 }
 
 func startDB() {
@@ -26,70 +24,34 @@ func startDB() {
 	}
 }
 
-type readRequest struct {
-	key    string
-	bucket string
+func Get(bucketName string, key string) []byte {
+	mutex.Lock()
+	var value []byte
+	db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucketName))
+		value = bucket.Get([]byte(key))
+		return nil
+	})
+	mutex.Unlock()
+
+	return value
 }
 
-var dbReadIn chan readRequest
-var dbReadOut chan []byte
-var dbReadErr chan error
-
-func dbReader() {
-
-	for {
-		read := <-dbReadIn
-		log.Println(read)
-		if read.bucket == "" {
-			read.bucket = "general"
+func Put(bucketName string, key string, value []byte) error {
+	mutex.Lock()
+	err := db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(bucketName))
+		if err != nil {
+			return err
 		}
+		err = b.Put([]byte(key), value)
+		return err
+	})
+	mutex.Unlock()
 
-		if read.key == "" {
-			dbReadErr <- errors.New("no key string supplied in request")
-			continue
-		}
-
-		//dbReadOut <- []byte("yay")
-
-		db.View(func(tx *bolt.Tx) error {
-			bucket := tx.Bucket([]byte(read.bucket))
-			value := bucket.Get([]byte(read.key))
-			dbReadOut <- value
-			return nil
-		})
-	}
+	return err
 }
 
 func Close() error {
 	return db.Close()
 }
-
-func Put(key string, json []byte) error {
-	// db.Update(func(tx *bolt.Tx) error {
-	// 	b := tx.Bucket([]byte("general"))
-	// 	err := b.Put([]byte(key), json)
-	// 	return err
-	// })
-	return nil
-}
-
-func PutInBucket(key string, json []byte) error {
-	// db.Update(func(tx *bolt.Tx) error {
-	// 	b := tx.Bucket([]byte("general"))
-	// 	err := b.Put([]byte(key), json)
-	// 	return err
-	// })
-	return nil
-}
-
-func Get(key string) ([]byte, error) {
-	return []byte{}, nil
-}
-
-func GetFromBucket(key string) ([]byte, error) {
-	return []byte{}, nil
-}
-
-// func GetAllFromBucket() [][]byte {
-// 	return [][]byte{}
-// }
