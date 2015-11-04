@@ -18,7 +18,7 @@ func init() {
 
 func startDB() {
 	var err error
-	db, err = bolt.Open("jsonStore.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+	db, err = bolt.Open("byteStore.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		log.Fatal(err)
 	}
