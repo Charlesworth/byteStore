@@ -34,6 +34,6 @@ func TestClose(t *testing.T) {
 func cleanup() {
 	os.Remove("byteStore.db")
 	if _, err := os.Stat("byteStore.db"); err == nil {
-		log.Println("unable to cleanup jsonStore.db file")
+		log.Println("unable to cleanup byteStore.db file")
 	}
 }
