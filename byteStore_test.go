@@ -56,6 +56,25 @@ func TestGetBucket(t *testing.T) {
 	}
 }
 
+func TestDelete(t *testing.T) {
+	Put("testDeleteBucket", "1", []byte("hi"))
+
+	getValue := Get("testDeleteBucket", "1")
+	if string(getValue) != "hi" {
+		t.Error("failed to set test value")
+	}
+
+	err := Delete("testDeleteBucket", "1")
+	if err != nil {
+		t.Error("Delete failed with error:", err)
+	}
+
+	getValue = Get("testDeleteBucket", "1")
+	if getValue != nil {
+		t.Error("Delete did not delete the key/value")
+	}
+}
+
 func TestClose(t *testing.T) {
 	err := Close()
 	if err != nil {

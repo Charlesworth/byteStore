@@ -84,6 +84,23 @@ func Put(bucket string, key string, value []byte) error {
 	return err
 }
 
+// Delete removes the key/value pair, returns nil if key/value doesn't exist
+func Delete(bucket string, key string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	err := db.Update(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucket))
+		if bucket == nil {
+			return nil
+		}
+
+		return bucket.Delete([]byte(key))
+	})
+
+	return err
+}
+
 // Close safely closes the database.
 func Close() error {
 	return db.Close()
