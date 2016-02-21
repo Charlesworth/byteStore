@@ -8,8 +8,10 @@ An abstraction library to enable simple Get and Put and other operations on top 
     GetBucketValues(bucket string) [][]byte
 
     Put(bucket string, key string, value []byte) error
-    
+
     Delete(bucket string, key string) error
+
+    DeleteBucket(bucket string) error
 
 A Close function is also provided, exiting your Go program without Close is safe as long as there are no currently running writing functions, as this could corrupt the .db file with a unfinished transaction.
 

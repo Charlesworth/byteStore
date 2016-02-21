@@ -137,6 +137,18 @@ func Delete(bucket string, key string) error {
 	return err
 }
 
+// DeleteBucket deletes a whole bucket
+func DeleteBucket(bucket string) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	err := db.Update(func(tx *bolt.Tx) error {
+		return tx.DeleteBucket([]byte(bucket))
+	})
+
+	return err
+}
+
 // Close safely closes the database.
 func Close() error {
 	return db.Close()
