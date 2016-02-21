@@ -1,6 +1,14 @@
 # byteStore
 An abstraction library to enable simple Get and Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Importing the library auto starts the database, the user can simply use the functions and not worry about starting a database. All exported functions are thread safe, so use indiscriminately throughout your Goroutines!
 
+    StartByteStore(byteStoreName string) error
+
+    DeleteByteStore(byteStoreName string) error
+
+    CleanByteStore(byteStoreName string) error
+
+    CloseByteStore(byteStoreName string) error
+
     Get(bucket string, key string) []byte
 
     GetBucket(bucket string) []KeyValue
