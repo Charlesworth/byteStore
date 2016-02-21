@@ -41,8 +41,8 @@ func Get(bucket string, key string) []byte {
 	return value
 }
 
-// GetBucket retrieves all values in a bucket, an empty byte will be returned if no values are present.
-func GetBucket(bucket string) [][]byte {
+// GetBucketValues retrieves all values in a bucket, an empty byte will be returned if no values are present.
+func GetBucketValues(bucket string) [][]byte {
 	mutex.Lock()
 	defer mutex.Unlock()
 

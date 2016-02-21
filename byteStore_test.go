@@ -29,14 +29,14 @@ func TestPutAndGet(t *testing.T) {
 	}
 }
 
-func TestGetBucket(t *testing.T) {
+func TestGetBucketValues(t *testing.T) {
 	testFirstValue := "first stored value!"
 	testLastValue := "last stored value!"
 	Put("testGetBucket", "1", []byte(testFirstValue))
 	Put("testGetBucket", "2", []byte("blah"))
 	Put("testGetBucket", "3", []byte(testLastValue))
 
-	getValues := GetBucket("testGetBucket")
+	getValues := GetBucketValues("testGetBucket")
 
 	if len(getValues) != 3 {
 		t.Error("GetBucket did not return the same amount of values as was in the test bucket")
@@ -50,7 +50,7 @@ func TestGetBucket(t *testing.T) {
 		t.Error("GetBucket did not return the correct first value")
 	}
 
-	getNoValues := GetBucket("uninitialisedBucket")
+	getNoValues := GetBucketValues("uninitialisedBucket")
 	if getNoValues != nil {
 		t.Error("GetBucket on an empty bucket should return a nil slice")
 	}
