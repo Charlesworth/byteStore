@@ -7,7 +7,7 @@ import "log"
 
 func TestInit(t *testing.T) {
 	if _, err := os.Stat("byteStore.db"); err != nil {
-		t.Error("balls")
+		t.Error("There was an issue with the init(), no .db file is present")
 	}
 }
 
