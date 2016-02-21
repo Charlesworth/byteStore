@@ -32,26 +32,53 @@ func TestPutAndGet(t *testing.T) {
 func TestGetBucketValues(t *testing.T) {
 	testFirstValue := "first stored value!"
 	testLastValue := "last stored value!"
-	Put("testGetBucket", "1", []byte(testFirstValue))
-	Put("testGetBucket", "2", []byte("blah"))
-	Put("testGetBucket", "3", []byte(testLastValue))
+	Put("testGetBucketValues", "1", []byte(testFirstValue))
+	Put("testGetBucketValues", "2", []byte("blah"))
+	Put("testGetBucketValues", "3", []byte(testLastValue))
 
-	getValues := GetBucketValues("testGetBucket")
+	getValues := GetBucketValues("testGetBucketValues")
 
 	if len(getValues) != 3 {
-		t.Error("GetBucket did not return the same amount of values as was in the test bucket")
+		t.Error("GetBucketValues did not return the same amount of values as was in the test bucket")
 	}
 
 	if string(getValues[0]) != testFirstValue {
-		t.Error("GetBucket did not return the correct first value")
+		t.Error("GetBucketValues did not return the correct first value")
 	}
 
 	if string(getValues[2]) != testLastValue {
-		t.Error("GetBucket did not return the correct first value")
+		t.Error("GetBucketValues did not return the correct first value")
 	}
 
 	getNoValues := GetBucketValues("uninitialisedBucket")
 	if getNoValues != nil {
+		t.Error("GetBucketValues on an empty bucket should return a nil slice")
+	}
+}
+
+func TestGetBucket(t *testing.T) {
+	testFirstValue := "first stored value!"
+	testLastValue := "last stored value!"
+	Put("testGetBucket", "1", []byte(testFirstValue))
+	Put("testGetBucket", "2", []byte("blah"))
+	Put("testGetBucket", "3", []byte(testLastValue))
+
+	getKeyVals := GetBucket("testGetBucket")
+
+	if len(getKeyVals) != 3 {
+		t.Error("GetBucket did not return the same amount of values as was in the test bucket")
+	}
+
+	if string(getKeyVals[0].value) != testFirstValue {
+		t.Error("GetBucket did not return the correct first value")
+	}
+
+	if string(getKeyVals[2].value) != testLastValue {
+		t.Error("GetBucket did not return the correct first value")
+	}
+
+	getNoKeyVals := GetBucket("uninitialisedBucket")
+	if getNoKeyVals != nil {
 		t.Error("GetBucket on an empty bucket should return a nil slice")
 	}
 }

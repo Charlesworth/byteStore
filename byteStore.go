@@ -24,7 +24,8 @@ func startDB() {
 	}
 }
 
-// Get retrieves the value using the bucket and key provided, an empty byte will be returned if no value is present.
+// Get retrieves the value using the bucket and key provided, an empty byte
+// will be returned if no value is present.
 func Get(bucket string, key string) []byte {
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -41,7 +42,42 @@ func Get(bucket string, key string) []byte {
 	return value
 }
 
-// GetBucketValues retrieves all values in a bucket, an empty byte will be returned if no values are present.
+// KeyValue is a container for a key value pair, most usualy used for
+// holding a slice of key value pairs
+type KeyValue struct {
+	key   string
+	value []byte
+}
+
+// GetBucket retrieves all keys and values in a bucket, an empty KeyValue slice
+// will be returned if no values are present.
+func GetBucket(bucket string) []KeyValue {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	var keyValues []KeyValue
+	db.View(func(tx *bolt.Tx) error {
+		bucket := tx.Bucket([]byte(bucket))
+		if bucket == nil {
+			return nil
+		}
+
+		cursor := bucket.Cursor()
+		key, value := cursor.First()
+		for {
+			if value == nil {
+				return nil
+			}
+			keyValues = append(keyValues, KeyValue{string(key), value})
+			key, value = cursor.Next()
+		}
+	})
+
+	return keyValues
+}
+
+// GetBucketValues retrieves all values in a bucket, an empty slice of bytes
+// will be returned if no values are present.
 func GetBucketValues(bucket string) [][]byte {
 	mutex.Lock()
 	defer mutex.Unlock()
