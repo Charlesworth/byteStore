@@ -6,12 +6,16 @@ import (
 	"github.com/boltdb/bolt"
 )
 
+// ByteStore is the struct which contains the pulicly exposed *bolt.DB driver
+// and attached byteStore methods
 type ByteStore struct {
-	db *bolt.DB
+	BoltDB *bolt.DB
 }
 
-func NewByteStore(dbName string) (ByteStore, error) {
-	db, err := bolt.Open(dbName, 0600, &bolt.Options{Timeout: 1 * time.Second})
+// NewByteStore returns an initialised byteStore with the dbFileName initialised
+// at the dbFileName target location
+func NewByteStore(dbFileName string) (ByteStore, error) {
+	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return ByteStore{}, err
 	}
@@ -24,7 +28,7 @@ func NewByteStore(dbName string) (ByteStore, error) {
 func (bs ByteStore) Get(bucket string, key string) []byte {
 
 	var value []byte
-	bs.db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket != nil {
 			value = bucket.Get([]byte(key))
@@ -47,7 +51,7 @@ type KeyValue struct {
 func (bs ByteStore) GetBucket(bucket string) []KeyValue {
 
 	var keyValues []KeyValue
-	bs.db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -72,7 +76,7 @@ func (bs ByteStore) GetBucket(bucket string) []KeyValue {
 func (bs ByteStore) GetBucketValues(bucket string) [][]byte {
 
 	var values [][]byte
-	bs.db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -95,7 +99,7 @@ func (bs ByteStore) GetBucketValues(bucket string) [][]byte {
 // Put inserts the key value into the db in the bucket specified.
 func (bs ByteStore) Put(bucket string, key string, value []byte) error {
 
-	err := bs.db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(bucket))
 		if err != nil {
 			return err
@@ -110,7 +114,7 @@ func (bs ByteStore) Put(bucket string, key string, value []byte) error {
 // Delete removes the key/value pair, returns nil if key/value doesn't exist
 func (bs ByteStore) Delete(bucket string, key string) error {
 
-	err := bs.db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -125,7 +129,7 @@ func (bs ByteStore) Delete(bucket string, key string) error {
 // DeleteBucket deletes a whole bucket
 func (bs ByteStore) DeleteBucket(bucket string) error {
 
-	err := bs.db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(bucket))
 	})
 
@@ -134,5 +138,5 @@ func (bs ByteStore) DeleteBucket(bucket string) error {
 
 // Close safely closes the database.
 func (bs ByteStore) Close() error {
-	return bs.db.Close()
+	return bs.BoltDB.Close()
 }
