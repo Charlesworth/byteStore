@@ -1,9 +1,9 @@
 # byteStore
-An abstraction library to enable simple Get and Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Importing the library, get a new byteStore with the byteStore.New() function to get started.
+An abstraction library to enable simple Get, Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Import the library and get a new ByteStore with the byteStore.New() function to get started.
 
     byteStore.New(dbFileName string) (ByteStore, error)
 
-The user can simply use the byteStore object's methods and not worry about database complexities. All methods are thread safe, backed by BoltDB's transactional nature, so use indiscriminately throughout your Goroutines!
+The user can simply use the ByteStore object's methods and not worry about database complexities. All methods are thread safe, backed by BoltDB's transactional nature, so use indiscriminately throughout your Goroutines!
 
     (ByteStore) Get(bucket string, key string) []byte
 
