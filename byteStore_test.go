@@ -129,6 +129,23 @@ func TestDeleteBucket(t *testing.T) {
 	}
 }
 
+func TestMultipleBolts(t *testing.T) {
+	secondTestBS, err := NewByteStore("byteStoreSecondary.db")
+	if err != nil {
+		t.Error("unable to start a secondary db instance with error:", err)
+	}
+
+	err = secondTestBS.Put("testBucket", "testKey", []byte("howdy partner"))
+	if err != nil {
+		t.Error("Second bolt instance unable to Put value with error:", err)
+	}
+
+	testValue := secondTestBS.Get("testBucket", "testKey")
+	if string(testValue) != "howdy partner" {
+		t.Error("Second bolt instance unable to correctly Get value")
+	}
+}
+
 func TestClose(t *testing.T) {
 	err := testBS.Close()
 	if err != nil {
@@ -141,5 +158,10 @@ func cleanup() {
 	os.Remove("byteStore.db")
 	if _, err := os.Stat("byteStore.db"); err == nil {
 		log.Println("unable to cleanup byteStore.db file")
+	}
+
+	os.Remove("byteStoreSecondary.db")
+	if _, err := os.Stat("byteStoreSecondary.db"); err == nil {
+		log.Println("unable to cleanup byteStoreSecondary.db file")
 	}
 }
