@@ -1,37 +1,34 @@
 package byteStore
 
 import (
-	"log"
-	"sync"
 	"time"
 
 	"github.com/boltdb/bolt"
 )
 
-var db *bolt.DB
-var mutex *sync.Mutex
-
-func init() {
-	mutex = &sync.Mutex{}
-	startDB()
+// ByteStore is the struct which contains the pulicly exposed *bolt.DB driver
+// and attached byteStore methods
+type ByteStore struct {
+	BoltDB *bolt.DB
 }
 
-func startDB() {
-	var err error
-	db, err = bolt.Open("byteStore.db", 0600, &bolt.Options{Timeout: 1 * time.Second})
+// New returns an initialised byteStore with the dbFileName initialised
+// at the dbFileName target location
+func New(dbFileName string) (ByteStore, error) {
+	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
-		log.Fatal(err)
+		return ByteStore{}, err
 	}
+
+	return ByteStore{db}, nil
 }
 
 // Get retrieves the value using the bucket and key provided, an empty byte
 // will be returned if no value is present.
-func Get(bucket string, key string) []byte {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) Get(bucket string, key string) []byte {
 
 	var value []byte
-	db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket != nil {
 			value = bucket.Get([]byte(key))
@@ -51,12 +48,10 @@ type KeyValue struct {
 
 // GetBucket retrieves all keys and values in a bucket, an empty KeyValue slice
 // will be returned if no values are present.
-func GetBucket(bucket string) []KeyValue {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) GetBucket(bucket string) []KeyValue {
 
 	var keyValues []KeyValue
-	db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -78,12 +73,10 @@ func GetBucket(bucket string) []KeyValue {
 
 // GetBucketValues retrieves all values in a bucket, an empty slice of bytes
 // will be returned if no values are present.
-func GetBucketValues(bucket string) [][]byte {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) GetBucketValues(bucket string) [][]byte {
 
 	var values [][]byte
-	db.View(func(tx *bolt.Tx) error {
+	bs.BoltDB.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -104,11 +97,9 @@ func GetBucketValues(bucket string) [][]byte {
 }
 
 // Put inserts the key value into the db in the bucket specified.
-func Put(bucket string, key string, value []byte) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) Put(bucket string, key string, value []byte) error {
 
-	err := db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(bucket))
 		if err != nil {
 			return err
@@ -121,11 +112,9 @@ func Put(bucket string, key string, value []byte) error {
 }
 
 // Delete removes the key/value pair, returns nil if key/value doesn't exist
-func Delete(bucket string, key string) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) Delete(bucket string, key string) error {
 
-	err := db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(bucket))
 		if bucket == nil {
 			return nil
@@ -138,11 +127,9 @@ func Delete(bucket string, key string) error {
 }
 
 // DeleteBucket deletes a whole bucket
-func DeleteBucket(bucket string) error {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (bs ByteStore) DeleteBucket(bucket string) error {
 
-	err := db.Update(func(tx *bolt.Tx) error {
+	err := bs.BoltDB.Update(func(tx *bolt.Tx) error {
 		return tx.DeleteBucket([]byte(bucket))
 	})
 
@@ -150,6 +137,6 @@ func DeleteBucket(bucket string) error {
 }
 
 // Close safely closes the database.
-func Close() error {
-	return db.Close()
+func (bs ByteStore) Close() error {
+	return bs.BoltDB.Close()
 }

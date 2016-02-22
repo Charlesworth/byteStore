@@ -1,20 +1,22 @@
 # byteStore
-An abstraction library to enable simple Get and Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Importing the library auto starts the database, the user can simply use the functions and not worry about starting a database. All exported functions are thread safe, so use indiscriminately throughout your Goroutines!
+An abstraction library to enable simple Get and Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Importing the library, get a new byteStore with the byteStore.New() function to get started.
 
-    Get(bucket string, key string) []byte
+    byteStore.New(dbFileName string) (ByteStore, error)
 
-    GetBucket(bucket string) []KeyValue
+The user can simply use the byteStore object's methods and not worry about database complexities. All methods are thread safe, backed by BoltDB's transactional nature, so use indiscriminately throughout your Goroutines!
 
-    GetBucketValues(bucket string) [][]byte
+    (ByteStore) Get(bucket string, key string) []byte
 
-    Put(bucket string, key string, value []byte) error
+    (ByteStore) GetBucket(bucket string) []KeyValue
 
-    Delete(bucket string, key string) error
+    (ByteStore) GetBucketValues(bucket string) [][]byte
 
-    DeleteBucket(bucket string) error
+    (ByteStore) Put(bucket string, key string, value []byte) error
 
-A Close function is also provided, exiting your Go program without Close is safe as long as there are no currently running writing functions, as this could corrupt the .db file with a unfinished transaction.
+    (ByteStore) Delete(bucket string, key string) error
 
-    Close() error
+    (ByteStore) DeleteBucket(bucket string) error
 
-Enjoy the library, pull and feature requests are welcome.
+    (ByteStore) Close() error
+
+The ByteStore type also exposes the underlying BoltDB driver publicly (ByteStore.BoltDB), meaning that if you want to do any more complex transactions not offered by the ByteStore methods, you can use boltDB directly. I hope you enjoy the library, pull and feature requests are welcome.
