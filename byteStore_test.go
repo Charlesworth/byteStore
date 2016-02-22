@@ -9,7 +9,7 @@ var testBS ByteStore
 
 func TestInit(t *testing.T) {
 	var err error
-	testBS, err = NewByteStore("byteStore.db")
+	testBS, err = New("byteStore.db")
 	if err != nil {
 		t.Error("rubbish")
 	}
@@ -130,7 +130,7 @@ func TestDeleteBucket(t *testing.T) {
 }
 
 func TestMultipleBolts(t *testing.T) {
-	secondTestBS, err := NewByteStore("byteStoreSecondary.db")
+	secondTestBS, err := New("byteStoreSecondary.db")
 	if err != nil {
 		t.Error("unable to start a secondary db instance with error:", err)
 	}

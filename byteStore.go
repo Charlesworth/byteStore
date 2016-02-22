@@ -12,9 +12,9 @@ type ByteStore struct {
 	BoltDB *bolt.DB
 }
 
-// NewByteStore returns an initialised byteStore with the dbFileName initialised
+// New returns an initialised byteStore with the dbFileName initialised
 // at the dbFileName target location
-func NewByteStore(dbFileName string) (ByteStore, error) {
+func New(dbFileName string) (ByteStore, error) {
 	db, err := bolt.Open(dbFileName, 0600, &bolt.Options{Timeout: 1 * time.Second})
 	if err != nil {
 		return ByteStore{}, err
