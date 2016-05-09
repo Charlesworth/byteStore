@@ -1,11 +1,14 @@
 package byteStore
 
-import "testing"
-
-import "os"
-import "log"
+import(
+	"testing"
+	"os"
+	"log"
+	"runtime"
+)
 
 var testBS ByteStore
+var secondTestBS ByteStore
 
 func TestInit(t *testing.T) {
 
@@ -131,7 +134,8 @@ func TestDeleteBucket(t *testing.T) {
 }
 
 func TestMultipleBolts(t *testing.T) {
-	secondTestBS, err := New("byteStoreSecondary.db")
+	var err error
+	secondTestBS, err = New("byteStoreSecondary.db")
 	if err != nil {
 		t.Error("unable to start a secondary db instance with error:", err)
 	}
@@ -152,6 +156,11 @@ func TestClose(t *testing.T) {
 	if err != nil {
 		t.Error("Close failed: ", err)
 	}
+
+	err = secondTestBS.Close()
+	if err != nil {
+		t.Error("Close failed: ", err)
+	}
 	cleanup()
 }
 
@@ -161,8 +170,17 @@ func cleanup() {
 		log.Println("unable to cleanup byteStore.db file")
 	}
 
-	os.Remove("byteStoreSecondary.db")
+	err := os.Remove("byteStoreSecondary.db")
+	if err != nil {
+		log.Println(err)
+	}
 	if _, err := os.Stat("byteStoreSecondary.db"); err == nil {
 		log.Println("unable to cleanup byteStoreSecondary.db file")
+	}
+
+	// If windows then additional .db.lock files get produced, so delete these too
+	if runtime.GOOS == "windows" {
+		os.Remove("byteStore.db.lock")
+		os.Remove("byteStoreSecondary.db.lock")
 	}
 }
