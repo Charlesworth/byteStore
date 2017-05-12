@@ -39,7 +39,7 @@ func (bs ByteStore) Get(bucket string, key string) []byte {
 	return value
 }
 
-// KeyValue is a container for a key value pair, most usualy used for
+// KeyValue is a container for a key value pair, most usually used for
 // holding a slice of key value pairs
 type KeyValue struct {
 	key   string

@@ -1,3 +1,5 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/Charlesworth/byteStore)](https://goreportcard.com/report/github.com/Charlesworth/byteStore)
+[![GoDoc](https://godoc.org/github.com/Charlesworth/byteStore?status.svg)](https://godoc.org/github.com/Charlesworth/byteStore)
 # byteStore
 An abstraction library to enable simple Get, Put and other operations on top of the fantastic [BoltDB](github.com/boltdb/bolt) key value store. Import the library and get a new ByteStore with the byteStore.New() function to get started.
 

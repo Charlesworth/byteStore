@@ -1,10 +1,10 @@
 package byteStore
 
-import(
-	"testing"
-	"os"
+import (
 	"log"
+	"os"
 	"runtime"
+	"testing"
 )
 
 var testBS ByteStore
